@@ -1,0 +1,44 @@
+-- Table 1: users
+-- Stores user information, including a role to differentiate between managers and employees.
+CREATE TABLE users (
+    user_id VARCHAR(255) PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(20) NOT NULL,
+    manager_id VARCHAR(255) REFERENCES users(user_id)
+);
+
+-- Table 2: goals
+-- Tracks individual goals assigned to employees by managers.
+CREATE TABLE goals (
+    goal_id VARCHAR(255) PRIMARY KEY,
+    employee_id VARCHAR(255) REFERENCES users(user_id) NOT NULL,
+    manager_id VARCHAR(255) REFERENCES users(user_id) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    due_date DATE,
+    status VARCHAR(20) DEFAULT 'draft',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table 3: tasks
+-- Records specific tasks related to a goal, submitted by employees for manager approval.
+CREATE TABLE tasks (
+    task_id VARCHAR(255) PRIMARY KEY,
+    goal_id VARCHAR(255) REFERENCES goals(goal_id) ON DELETE CASCADE NOT NULL,
+    description TEXT,
+    status VARCHAR(20) DEFAULT 'pending',
+    progress VARCHAR(20) DEFAULT 'not started',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table 4: feedback
+-- Stores written feedback provided by managers on a specific goal.
+CREATE TABLE feedback (
+    feedback_id VARCHAR(255) PRIMARY KEY,
+    goal_id VARCHAR(255) REFERENCES goals(goal_id) ON DELETE CASCADE NOT NULL,
+    manager_id VARCHAR(255) REFERENCES users(user_id) NOT NULL,
+    feedback_text TEXT,
+    feedback_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
